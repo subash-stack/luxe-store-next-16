@@ -1,26 +1,356 @@
 @import "tailwindcss";
 
+/*
+ * Luxe Store design system.
+ *
+ * Principles: monochrome canvas so photography carries the colour, one deep
+ * accent used sparingly, small tracked uppercase labels for UI chrome, square
+ * edges, hairline rules instead of shadows, and generous fluid whitespace.
+ *
+ * Raw values live on :root so sections can re-scope them (see `.theme-inverse`).
+ * `@theme inline` maps them onto Tailwind utilities (bg-canvas, text-ink, ...).
+ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Colour */
+  --canvas: #ffffff;
+  --ink: #111111;
+  --ink-muted: #5c5c5c;
+  --ink-subtle: #8c8c8c;
+  --surface: #f5f4f1; /* product image backdrop */
+  --surface-strong: #eceae5;
+  --line: #e2e0db;
+  --line-strong: #111111;
+  --accent: #5e1a1f; /* oxblood: badges, sale, the occasional editorial moment */
+  --accent-ink: #ffffff;
+  --danger: #a3262a;
+  --success: #2f5d3a;
+  --overlay: rgb(17 17 17 / 0.4);
+
+  /* Layout */
+  --gutter: clamp(1rem, 0.5rem + 2vw, 2.5rem);
+  --section: clamp(3rem, 1.5rem + 6vw, 8rem);
+  --header-height: 3.5rem;
+
+  /* Motion */
+  --duration-fast: 150ms;
+  --duration-base: 300ms;
+  --duration-slow: 600ms;
+
+  color-scheme: light;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@media (width >= 64rem) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --header-height: 4.5rem;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Dark bands (footer, hero overlays, promo strips) swap the palette locally. */
+.theme-inverse {
+  --canvas: #111111;
+  --ink: #ffffff;
+  --ink-muted: #b8b8b8;
+  --ink-subtle: #8c8c8c;
+  --surface: #1c1c1c;
+  --surface-strong: #262626;
+  --line: #333333;
+  --line-strong: #ffffff;
+  --overlay: rgb(0 0 0 / 0.5);
+  color-scheme: dark;
+  background-color: var(--canvas);
+  color: var(--ink);
+}
+
+@theme inline {
+  /* Fonts (CSS variables come from next/font in layout.tsx) */
+  --font-sans: var(--font-sans-face), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display-face), ui-serif, Georgia, serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Colours */
+  --color-canvas: var(--canvas);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-subtle: var(--ink-subtle);
+  --color-surface: var(--surface);
+  --color-surface-strong: var(--surface-strong);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-danger: var(--danger);
+  --color-success: var(--success);
+  --color-overlay: var(--overlay);
+
+  /* Fluid spacing: px-gutter, py-section, h-header, scroll-mt-header ... */
+  --spacing-gutter: var(--gutter);
+  --spacing-section: var(--section);
+  --spacing-header: var(--header-height);
+}
+
+@theme {
+  /* Type scale. UI text is small; reading text and headlines scale fluidly. */
+  --text-micro: 0.6875rem; /* 11px: nav, eyebrows, badges, button labels */
+  --text-micro--line-height: 1rem;
+  --text-micro--letter-spacing: 0.12em;
+  --text-caption: 0.75rem; /* 12px: meta, helper text, breadcrumbs */
+  --text-caption--line-height: 1.125rem;
+  --text-caption--letter-spacing: 0.02em;
+  --text-body-sm: 0.8125rem; /* 13px: product card name/price */
+  --text-body-sm--line-height: 1.25rem;
+  --text-body: 0.875rem; /* 14px: default UI copy */
+  --text-body--line-height: 1.5rem;
+  --text-body-lg: 1rem; /* 16px: long-form reading, product descriptions */
+  --text-body-lg--line-height: 1.75rem;
+  --text-title: 1.25rem;
+  --text-title--line-height: 1.75rem;
+  --text-title--letter-spacing: 0.01em;
+  --text-headline: clamp(1.75rem, 1.2rem + 2.2vw, 3rem);
+  --text-headline--line-height: 1.1;
+  --text-headline--letter-spacing: -0.01em;
+  --text-display: clamp(2.5rem, 1.25rem + 5.5vw, 6.5rem);
+  --text-display--line-height: 1;
+  --text-display--letter-spacing: -0.02em;
+
+  --tracking-label: 0.12em;
+  --tracking-wide-label: 0.2em;
+
+  /* Containers: max-w-page, max-w-content, max-w-prose-narrow */
+  --container-page: 120rem; /* 1920px: full chrome + grids */
+  --container-content: 90rem; /* 1440px: PDP, account, checkout */
+  --container-prose-narrow: 38rem; /* editorial copy */
+
+  --breakpoint-3xl: 120rem;
+
+  --ease-luxe: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --aspect-portrait: 4 / 5;
+  --aspect-product: 3 / 4;
+  --aspect-hero: 16 / 9;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Base                                                                       */
+/* -------------------------------------------------------------------------- */
+
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-line);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-padding-top: var(--header-height);
+  }
+
+  body {
+    @apply bg-canvas font-sans text-body text-ink;
+    font-feature-settings: "kern";
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-normal text-balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* Prevent iOS zoom on focus: form controls stay at 16px below md. */
+  input,
+  select,
+  textarea {
+    @apply text-body-lg md:text-body;
+  }
+
+  ::selection {
+    background-color: var(--color-ink);
+    color: var(--color-canvas);
+  }
+
+  :focus-visible {
+    outline: 1px solid var(--color-ink);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Typography primitives                                                       */
+/* -------------------------------------------------------------------------- */
+
+/* Small tracked uppercase label: nav items, eyebrows, filters, badges. */
+@utility type-label {
+  @apply text-micro font-medium uppercase;
+}
+
+@utility type-eyebrow {
+  @apply text-micro font-medium tracking-wide-label text-ink-muted uppercase;
+}
+
+@utility type-display {
+  @apply font-display text-display font-normal;
+}
+
+@utility type-headline {
+  @apply font-display text-headline font-normal;
+}
+
+@utility type-price {
+  @apply text-body-sm tabular-nums;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Layout primitives                                                           */
+/* -------------------------------------------------------------------------- */
+
+/* Full-width chrome and grids, padded by the fluid gutter. */
+@utility page-container {
+  @apply mx-auto w-full max-w-page px-gutter;
+}
+
+/* Narrower reading/transaction width (PDP details, account, checkout). */
+@utility content-container {
+  @apply mx-auto w-full max-w-content px-gutter;
+}
+
+@utility prose-container {
+  @apply mx-auto w-full max-w-prose-narrow px-gutter;
+}
+
+/* Escape any container to span the viewport (heroes, campaign imagery). */
+@utility full-bleed {
+  @apply relative left-1/2 w-screen max-w-none -translate-x-1/2;
+}
+
+@utility section {
+  @apply py-section;
+}
+
+/* Vertical rhythm helper: direct children separated by a hairline. */
+@utility divide-hairline {
+  @apply divide-y divide-line;
+}
+
+/* Product listing grid: 2 → 3 → 4 columns, tight gutters so imagery dominates. */
+@utility product-grid {
+  @apply grid grid-cols-2 gap-x-px gap-y-10 md:grid-cols-3 md:gap-y-14 xl:grid-cols-4;
+}
+
+/* Editorial mosaic: stacked on mobile, two-up from md. */
+@utility split {
+  @apply grid grid-cols-1 gap-px md:grid-cols-2;
+}
+
+/* Horizontal snap rail (carousels, "you may also like") with no scrollbar. */
+@utility rail {
+  @apply grid auto-cols-[72%] grid-flow-col gap-px overflow-x-auto overscroll-x-contain sm:auto-cols-[42%] lg:auto-cols-[24%];
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  & > * {
+    scroll-snap-align: start;
+  }
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Image frame: fixed ratio on the warm surface so cut-outs and shots align. */
+@utility media-frame {
+  @apply relative aspect-product overflow-hidden bg-surface;
+  & > img,
+  & > video {
+    @apply absolute inset-0 size-full object-cover;
+  }
+}
+
+/* Sticky site header with hairline; transparent variant sits over a hero. */
+@utility site-header {
+  @apply sticky top-0 z-40 flex h-header items-center border-b border-line bg-canvas;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Links                                                                       */
+/* -------------------------------------------------------------------------- */
+
+/* Inline text link: thin underline that recedes on hover. */
+@utility link {
+  @apply underline decoration-1 underline-offset-4 transition-colors duration-(--duration-fast) hover:text-ink-muted;
+}
+
+/* Navigation link: no underline at rest, hairline grows in on hover/active. */
+@utility nav-link {
+  @apply type-label relative inline-flex items-center py-2;
+  &::after {
+    @apply absolute inset-x-0 bottom-1 h-px origin-left scale-x-0 bg-current transition-transform duration-(--duration-base) ease-luxe content-[''];
+  }
+  &:hover::after,
+  &[aria-current="page"]::after {
+    @apply scale-x-100;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Buttons                                                                     */
+/* Square, 48px tall (44px for sm), uppercase micro labels, 1px borders.       */
+/* -------------------------------------------------------------------------- */
+
+@layer components {
+  .btn {
+    @apply type-label inline-flex h-12 items-center justify-center gap-2 border px-8 whitespace-nowrap transition-colors duration-(--duration-fast) ease-luxe select-none disabled:pointer-events-none disabled:opacity-40 aria-disabled:pointer-events-none aria-disabled:opacity-40;
+  }
+
+  .btn-primary {
+    @apply border-ink bg-ink text-canvas hover:border-ink-muted hover:bg-ink-muted;
+  }
+
+  .btn-secondary {
+    @apply border-line-strong bg-transparent text-ink hover:bg-ink hover:text-canvas;
+  }
+
+  .btn-accent {
+    @apply border-accent bg-accent text-accent-ink hover:opacity-90;
+  }
+
+  /* Text-only action ("View all", "Edit") */
+  .btn-ghost {
+    @apply h-auto border-transparent px-0 underline decoration-1 underline-offset-4 hover:text-ink-muted;
+  }
+
+  .btn-sm {
+    @apply h-11 px-5;
+  }
+
+  .btn-block {
+    @apply w-full;
+  }
+
+  /* Square icon button (search, bag, menu): 44px target. */
+  .btn-icon {
+    @apply size-11 border-transparent px-0;
+  }
 }

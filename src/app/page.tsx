@@ -1,69 +1,120 @@
-import Image from "next/image";
+import Link from "next/link";
+
+import { Button, ButtonLink } from "@/components/ui/button";
+import { Container, Section } from "@/components/ui/container";
+
+// Temporary design-system preview. Replace with the real storefront home page.
+
+const nav = ["New In", "Women", "Men", "Bags", "Shoes", "Jewelry"];
+const products = Array.from({ length: 8 }, (_, i) => ({
+  id: i + 1,
+  name: `Product name ${i + 1}`,
+  price: `$${(1200 + i * 150).toLocaleString("en-US")}`,
+}));
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <>
+      <header className="site-header">
+        <Container className="flex items-center justify-between">
+          <nav aria-label="Primary" className="hidden gap-6 lg:flex">
+            {nav.map((item, i) => (
+              <Link
+                key={item}
+                href="/"
+                className="nav-link"
+                aria-current={i === 0 ? "page" : undefined}
+              >
+                {item}
+              </Link>
+            ))}
+          </nav>
+          <Button variant="ghost" size="icon" className="lg:hidden">
+            Menu
+          </Button>
+          <Link href="/" className="type-label tracking-wide-label">
+            Luxe Store
+          </Link>
+          <div className="flex gap-4">
+            <Link href="/" className="nav-link">
+              Search
+            </Link>
+            <Link href="/" className="nav-link">
+              Bag (0)
+            </Link>
+          </div>
+        </Container>
+      </header>
+
+      <main className="flex-1">
+        <div className="relative flex aspect-[4/5] items-end bg-surface-strong md:aspect-hero">
+          <Container className="pb-12 text-center md:pb-20">
+            <p className="type-eyebrow">Autumn collection</p>
+            <h1 className="type-display mt-4">Quiet materials</h1>
+            <div className="mt-8 flex justify-center gap-3">
+              <ButtonLink href="/">Shop women</ButtonLink>
+              <ButtonLink href="/" variant="secondary">
+                Shop men
+              </ButtonLink>
+            </div>
+          </Container>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+
+        <Section>
+          <Container>
+            <div className="mb-8 flex items-baseline justify-between">
+              <h2 className="type-headline">New in</h2>
+              <Link href="/" className="link type-label">
+                View all
+              </Link>
+            </div>
+            <ul className="product-grid">
+              {products.map((p) => (
+                <li key={p.id}>
+                  <Link href="/" className="group block">
+                    <div className="media-frame" />
+                    <div className="mt-3 space-y-1 px-1 text-center">
+                      <p className="text-body-sm">{p.name}</p>
+                      <p className="type-price text-ink-muted">{p.price}</p>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </Container>
+        </Section>
+
+        <Section className="border-t">
+          <Container width="prose" className="space-y-6 text-center">
+            <p className="type-eyebrow">Services</p>
+            <h2 className="type-headline">Complimentary shipping and returns</h2>
+            <p className="text-body-lg text-ink-muted">
+              Placeholder copy for an editorial block. Body text runs at 16px
+              for reading; interface text runs at 14px.{" "}
+              <Link href="/" className="link text-ink">
+                Read more
+              </Link>
+            </p>
+            <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+              <Button>Primary</Button>
+              <Button variant="secondary">Secondary</Button>
+              <Button variant="accent">Accent</Button>
+              <Button disabled>Disabled</Button>
+            </div>
+          </Container>
+        </Section>
       </main>
-    </div>
+
+      <Section as="footer" inverse>
+        <Container className="grid gap-8 md:grid-cols-3">
+          {["Client services", "The company", "Legal"].map((heading) => (
+            <div key={heading} className="space-y-3">
+              <p className="type-label">{heading}</p>
+              <p className="text-caption text-ink-muted">Footer links</p>
+            </div>
+          ))}
+        </Container>
+      </Section>
+    </>
   );
 }
