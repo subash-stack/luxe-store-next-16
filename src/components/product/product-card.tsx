@@ -18,10 +18,16 @@ export function ProductCard({ product }: { product: Product }) {
             tone={color.hex}
             className="transition-transform duration-(--duration-slow) ease-luxe group-hover:scale-[1.04]"
           />
-          {product.isNew && (
+          {product.stock <= 0 ? (
             <span className="type-label absolute top-3 left-3 text-ink-muted">
-              New
+              Sold out
             </span>
+          ) : (
+            product.isNew && (
+              <span className="type-label absolute top-3 left-3 text-ink-muted">
+                New
+              </span>
+            )
           )}
         </div>
 

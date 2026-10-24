@@ -51,8 +51,12 @@ export type Product = {
   /** Minor units (cents), USD. */
   price: number;
   isNew: boolean;
+  /** Units available. 0 = sold out. */
+  stock: number;
   /** ISO date, used for "Newest" sorting. */
   createdAt: string;
 };
 
-export type SortKey = "featured" | "newest" | "price-asc" | "price-desc";
+export type StockState = "in-stock" | "low-stock" | "sold-out";
+
+export type SortKey ="featured" | "newest" | "price-asc" | "price-desc";

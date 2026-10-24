@@ -1,4 +1,4 @@
-import { categories, colors, products } from "./data";
+import { categories, colors, kindCopy, products } from "./data";
 import type {
   Category,
   CategorySlug,
@@ -6,6 +6,7 @@ import type {
   ColorSlug,
   Product,
   SortKey,
+  StockState,
 } from "./types";
 
 export type * from "./types";
@@ -76,6 +77,45 @@ export async function getProducts({
     total: sorted.length,
     hasMore: end < sorted.length,
   };
+}
+
+export async function getProduct(slug: string): Promise<Product | undefined> {
+  "use cache";
+  return products.find((p) => p.slug === slug);
+}
+
+export async function getAllProductSlugs(): Promise<string[]> {
+  return products.map((p) => p.slug);
+}
+
+/** Same style in other colours (matched by name within the category). */
+export async function getColorways(product: Product): Promise<Product[]> {
+  "use cache";
+  return products.filter(
+    (p) => p.category === product.category && p.name === product.name,
+  );
+}
+
+/** Other pieces from the same category, newest first, padded from the full catalog. */
+export async function getRelatedProducts(product: Product, limit = 4): Promise<Product[]> {
+  "use cache";
+  const others = products.filter((p) => p.name !== product.name);
+  const byNewest = (a: Product, b: Product) => b.createdAt.localeCompare(a.createdAt);
+  const sameCategory = others.filter((p) => p.category === product.category).sort(byNewest);
+  const rest = others.filter((p) => p.category !== product.category).sort(byNewest);
+  return [...sameCategory, ...rest].slice(0, limit);
+}
+
+export function getProductCopy(product: Product) {
+  return kindCopy[product.kind];
+}
+
+export const LOW_STOCK_THRESHOLD = 5;
+
+export function stockState(stock: number): StockState {
+  if (stock <= 0) return "sold-out";
+  if (stock <= LOW_STOCK_THRESHOLD) return "low-stock";
+  return "in-stock";
 }
 
 /** Colours that appear in a category, so the filter never offers empty results. */

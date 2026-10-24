@@ -76,13 +76,23 @@ const shapes: Record<ProductKind, ReactNode> = {
   ),
 };
 
+export type ProductArtView = "front" | "detail" | "reverse";
+
+// SVG transforms that fake extra gallery shots from one silhouette.
+const viewTransform: Record<ProductArtView, string | undefined> = {
+  front: undefined,
+  detail: "translate(150 215) scale(2.1) translate(-150 -215)",
+  reverse: "translate(300 0) scale(-1 1)",
+};
+
 type ProductArtProps = {
   kind: ProductKind;
   tone: string;
+  view?: ProductArtView;
   className?: string;
 };
 
-export function ProductArt({ kind, tone, className }: ProductArtProps) {
+export function ProductArt({ kind, tone, view = "front", className }: ProductArtProps) {
   return (
     <svg
       viewBox="0 0 300 400"
@@ -93,9 +103,14 @@ export function ProductArt({ kind, tone, className }: ProductArtProps) {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <ellipse cx="150" cy="352" rx="96" ry="7" fill="#000" stroke="none" opacity="0.06" />
+      {view !== "detail" && (
+        <ellipse cx="150" cy="352" rx="96" ry="7" fill="#000" stroke="none" opacity="0.06" />
+      )}
       {/* Soft edge keeps pale colourways (ivory) legible on the surface. */}
-      <g style={{ filter: "drop-shadow(0 0 0.75px rgb(0 0 0 / 0.35))" }}>
+      <g
+        transform={viewTransform[view]}
+        style={{ filter: "drop-shadow(0 0 0.75px rgb(0 0 0 / 0.35))" }}
+      >
         {shapes[kind]}
       </g>
     </svg>
