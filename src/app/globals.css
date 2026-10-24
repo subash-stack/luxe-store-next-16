@@ -266,16 +266,20 @@
   @apply grid grid-cols-1 gap-px md:grid-cols-2;
 }
 
-/* Horizontal snap rail (carousels, "you may also like") with no scrollbar. */
-@utility rail {
-  @apply grid auto-cols-[72%] grid-flow-col gap-px overflow-x-auto overscroll-x-contain sm:auto-cols-[42%] lg:auto-cols-[24%];
-  scroll-snap-type: x mandatory;
+/* Scrollable without a visible scrollbar (tab rows, rails). */
+@utility scrollbar-none {
   scrollbar-width: none;
-  & > * {
-    scroll-snap-align: start;
-  }
   &::-webkit-scrollbar {
     display: none;
+  }
+}
+
+/* Horizontal snap rail (carousels, "you may also like") with no scrollbar. */
+@utility rail {
+  @apply scrollbar-none grid auto-cols-[72%] grid-flow-col gap-px overflow-x-auto overscroll-x-contain sm:auto-cols-[42%] lg:auto-cols-[24%];
+  scroll-snap-type: x mandatory;
+  & > * {
+    scroll-snap-align: start;
   }
 }
 
