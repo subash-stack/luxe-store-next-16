@@ -3,4 +3,5 @@
 //
 // Better Auth tables can be generated with: npm run auth:generate
 
+export * from "./auth";
 export * from "./catalog";
