@@ -1,13 +1,14 @@
 import Link from "next/link";
 
-import { categories } from "@/lib/catalog/data";
+import { getCategories } from "@/lib/catalog";
 
-const nav = [
-  { href: "/shop", label: "Shop all" },
-  ...categories.map((c) => ({ href: `/shop/${c.slug}`, label: c.name })),
-];
+export async function SiteHeader() {
+  const categories = await getCategories();
+  const nav = [
+    { href: "/shop", label: "Shop all" },
+    ...categories.map((c) => ({ href: `/shop/${c.slug}`, label: c.name })),
+  ];
 
-export function SiteHeader() {
   return (
     <header className="site-header">
       <div className="page-container grid grid-cols-[1fr_auto_1fr] items-center">

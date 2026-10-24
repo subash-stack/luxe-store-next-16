@@ -1,13 +1,9 @@
 import Link from "next/link";
 
 import { Section } from "@/components/ui/container";
-import { categories } from "@/lib/catalog/data";
+import { getCategories } from "@/lib/catalog";
 
-const columns = [
-  {
-    heading: "Shop",
-    links: categories.map((c) => ({ href: `/shop/${c.slug}`, label: c.name })),
-  },
+const staticColumns = [
   {
     heading: "Client services",
     links: [
@@ -26,7 +22,16 @@ const columns = [
   },
 ];
 
-export function SiteFooter() {
+export async function SiteFooter() {
+  const categories = await getCategories();
+  const columns = [
+    {
+      heading: "Shop",
+      links: categories.map((c) => ({ href: `/shop/${c.slug}`, label: c.name })),
+    },
+    ...staticColumns,
+  ];
+
   return (
     <Section as="footer" inverse>
       <div className="page-container grid gap-10 sm:grid-cols-3">

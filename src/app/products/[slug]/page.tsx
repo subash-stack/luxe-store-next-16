@@ -3,7 +3,7 @@ import { Suspense } from "react";
 
 import { ProductDetail } from "@/components/product/product-detail";
 import { ProductDetailSkeleton } from "@/components/product/product-detail-skeleton";
-import { getAllProductSlugs, getProduct, getProductCopy } from "@/lib/catalog";
+import { getAllProductSlugs, getProduct } from "@/lib/catalog";
 
 export async function generateStaticParams() {
   const slugs = await getAllProductSlugs();
@@ -15,7 +15,7 @@ export async function generateMetadata({
 }: PageProps<"/products/[slug]">): Promise<Metadata> {
   const product = await getProduct((await params).slug);
   return product
-    ? { title: product.name, description: getProductCopy(product).description }
+    ? { title: product.name, description: product.description }
     : {};
 }
 

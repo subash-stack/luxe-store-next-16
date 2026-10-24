@@ -13,7 +13,6 @@ import {
   getCategory,
   getColorways,
   getProduct,
-  getProductCopy,
   getRelatedProducts,
 } from "@/lib/catalog";
 import { cn } from "@/lib/cn";
@@ -32,7 +31,6 @@ export async function ProductDetail({ slug: slugPromise }: { slug: Promise<strin
     getRelatedProducts(product),
   ]);
   const color = colorBySlug[product.color];
-  const copy = getProductCopy(product);
   const soldOut = product.stock <= 0;
 
   return (
@@ -113,13 +111,13 @@ export async function ProductDetail({ slug: slugPromise }: { slug: Promise<strin
 
           <div className="mt-10 border-b">
             <InfoSection title="Description" open>
-              <p>{copy.description}</p>
+              <p>{product.description}</p>
             </InfoSection>
             <InfoSection title="Details">
               <ul className="space-y-1.5">
                 <li>{product.material}</li>
                 <li>Colour: {color.name}</li>
-                {copy.details.map((detail) => (
+                {product.details.map((detail) => (
                   <li key={detail}>{detail}</li>
                 ))}
                 <li className="pt-2 text-ink-subtle">Style {product.id.toUpperCase()}</li>

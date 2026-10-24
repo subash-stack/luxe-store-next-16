@@ -1,9 +1,9 @@
-export type CategorySlug =
-  | "bags"
-  | "shoes"
-  | "ready-to-wear"
-  | "accessories"
-  | "jewelry";
+import type { ColorSlug, ProductKind } from "./constants";
+
+export type { Color, ColorSlug, ProductKind, SortKey } from "./constants";
+
+/** Category slugs are data now (the `category` table), not a fixed union. */
+export type CategorySlug = string;
 
 export type Category = {
   slug: CategorySlug;
@@ -11,36 +11,9 @@ export type Category = {
   description: string;
 };
 
-/** Silhouette used by the placeholder product art until real photography exists. */
-export type ProductKind =
-  | "tote"
-  | "shoulder-bag"
-  | "loafer"
-  | "sneaker"
-  | "coat"
-  | "knit"
-  | "scarf"
-  | "sunglasses"
-  | "belt"
-  | "ring";
-
-export type ColorSlug =
-  | "black"
-  | "ivory"
-  | "camel"
-  | "cognac"
-  | "oxblood"
-  | "navy"
-  | "olive"
-  | "grey";
-
-export type Color = {
-  slug: ColorSlug;
-  name: string;
-  hex: string;
-};
-
+/** Plain, serialisable product shape that every page and component receives. */
 export type Product = {
+  /** Display style code, e.g. "LS-001" (derived from the database id). */
   id: string;
   slug: string;
   name: string;
@@ -48,15 +21,15 @@ export type Product = {
   kind: ProductKind;
   color: ColorSlug;
   material: string;
+  description: string;
+  details: string[];
   /** Minor units (cents), USD. */
   price: number;
   isNew: boolean;
   /** Units available. 0 = sold out. */
   stock: number;
-  /** ISO date, used for "Newest" sorting. */
+  /** ISO timestamp, used for "Newest" sorting. */
   createdAt: string;
 };
 
 export type StockState = "in-stock" | "low-stock" | "sold-out";
-
-export type SortKey ="featured" | "newest" | "price-asc" | "price-desc";
