@@ -23,6 +23,8 @@ export type Product = {
   material: string;
   description: string;
   details: string[];
+  /** Product photo URL, or null to show placeholder art. */
+  imageUrl: string | null;
   /** Minor units (cents), USD. */
   price: number;
   isNew: boolean;

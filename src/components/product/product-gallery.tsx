@@ -1,5 +1,7 @@
+import Image from "next/image";
+
 import { ProductArt, type ProductArtView } from "@/components/product/product-art";
-import type { Product } from "@/lib/catalog";
+import { colorBySlug, type Product } from "@/lib/catalog";
 import { cn } from "@/lib/cn";
 
 const shots: { view: ProductArtView; backdrop: string; label: string }[] = [
@@ -13,6 +15,23 @@ const shots: { view: ProductArtView; backdrop: string; label: string }[] = [
  * a two-column stack of large frames from lg up.
  */
 export function ProductGallery({ product, tone }: { product: Product; tone: string }) {
+  // One photo per product for now: a single large frame instead of the
+  // placeholder art's three views.
+  if (product.imageUrl) {
+    return (
+      <figure className="media-frame -mx-gutter lg:mx-0 lg:aspect-portrait">
+        <Image
+          src={product.imageUrl}
+          alt={`${product.name} in ${colorBySlug[product.color].name.toLowerCase()}`}
+          fill
+          preload
+          sizes="(min-width: 64rem) 60vw, 100vw"
+          className="object-cover"
+        />
+      </figure>
+    );
+  }
+
   return (
     <div
       role="region"

@@ -4,7 +4,7 @@ import type { ProductKind } from "@/lib/catalog";
 import { cn } from "@/lib/cn";
 
 // Placeholder product imagery: a flat silhouette in the product's colour on the
-// surface backdrop. Swap for next/image once real photography exists.
+// surface backdrop. Shown only for products without an `imageUrl`.
 
 const shapes: Record<ProductKind, ReactNode> = {
   tote: (

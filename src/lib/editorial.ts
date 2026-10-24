@@ -1,8 +1,9 @@
 import type { CategorySlug } from "@/lib/catalog";
+import { unsplash } from "@/lib/unsplash";
 
 // Editorial photography from Unsplash (free to use under the Unsplash License).
-// Credits are kept here for attribution. Product cards still use placeholder
-// art until real product photography exists.
+// Credits are kept here for attribution. Product photos live in the database
+// (seeded from src/db/seed-data.ts).
 
 export type Photo = {
   src: string;
@@ -11,11 +12,6 @@ export type Photo = {
   height: number;
   credit: string;
 };
-
-function unsplash(id: string) {
-  // Must match the remotePatterns `search` in next.config.ts exactly.
-  return `https://images.unsplash.com/photo-${id}?w=2400&q=80`;
-}
 
 export const photos = {
   hero: {

@@ -40,6 +40,8 @@ export const product = pgTable(
     material: text("material").notNull(),
     color: productColor("color").notNull(),
     kind: productKind("kind").notNull(),
+    /** Product photo URL. Null falls back to placeholder art. */
+    imageUrl: text("image_url"),
     /** Minor units (cents), USD. */
     priceCents: integer("price_cents").notNull(),
     isNew: boolean("is_new").notNull().default(false),
