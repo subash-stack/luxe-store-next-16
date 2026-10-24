@@ -357,4 +357,26 @@
   .btn-icon {
     @apply size-11 border-transparent px-0;
   }
+
+  /* Form fields: square, hairline border that darkens on focus, 48px tall like buttons. */
+  .field {
+    @apply block h-12 w-full border border-line bg-canvas px-4 text-ink transition-colors duration-(--duration-fast) placeholder:text-ink-subtle hover:border-ink-subtle focus:border-ink focus-visible:outline-none aria-invalid:border-danger user-invalid:border-danger;
+  }
+
+  /* Multi-line variant: same border and focus states, grows with content. */
+  .field-textarea {
+    @apply h-auto min-h-28 resize-y py-3 leading-relaxed;
+  }
+
+  .field-hint {
+    @apply mt-2 text-caption text-ink-subtle;
+  }
+
+  .field-label {
+    @apply mb-2 block text-caption text-ink-muted;
+  }
+
+  .field-error {
+    @apply mt-2 text-caption text-danger;
+  }
 }

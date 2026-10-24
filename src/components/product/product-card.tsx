@@ -7,6 +7,9 @@ import { colorBySlug, formatPrice, type Product } from "@/lib/catalog";
 const hoverZoom =
   "transition-transform duration-(--duration-slow) ease-luxe group-hover:scale-[1.04]";
 
+// Solid canvas chip so the label stays legible on any photo.
+const badge = "type-label absolute top-3 left-3 bg-canvas px-2 py-1 text-ink-muted";
+
 export function ProductCard({ product }: { product: Product }) {
   const color = colorBySlug[product.color];
 
@@ -30,15 +33,9 @@ export function ProductCard({ product }: { product: Product }) {
             <ProductArt kind={product.kind} tone={color.hex} className={hoverZoom} />
           )}
           {product.stock <= 0 ? (
-            <span className="type-label absolute top-3 left-3 text-ink-muted">
-              Sold out
-            </span>
+            <span className={badge}>Sold out</span>
           ) : (
-            product.isNew && (
-              <span className="type-label absolute top-3 left-3 text-ink-muted">
-                New
-              </span>
-            )
+            product.isNew && <span className={badge}>New</span>
           )}
         </div>
 

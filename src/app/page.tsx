@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ProductCard } from "@/components/product/product-card";
 import { ButtonLink } from "@/components/ui/button";
 import { Container, Section } from "@/components/ui/container";
-import { getProducts } from "@/lib/catalog";
+import { getNewArrivals, getProducts } from "@/lib/catalog";
 import { featuredCollections, photos } from "@/lib/editorial";
 
 const GIFT_LIMIT = 50000; // cents
@@ -29,8 +29,8 @@ const services = [
 ];
 
 export default async function Home() {
-  const [{ items: newIn }, { items: byPrice }] = await Promise.all([
-    getProducts({ sort: "newest" }),
+  const [newIn, { items: byPrice }] = await Promise.all([
+    getNewArrivals(8),
     getProducts({ sort: "price-asc" }),
   ]);
   const gifts = byPrice.filter((p) => p.price <= GIFT_LIMIT).slice(0, 4);
@@ -44,7 +44,8 @@ export default async function Home() {
             src={photos.hero.src}
             alt={photos.hero.alt}
             fill
-            preload
+            loading="eager"
+            fetchPriority="high"
             sizes="(min-width: 48rem) 60vw, 100vw"
             className="object-cover object-[30%_center]"
           />
@@ -56,7 +57,7 @@ export default async function Home() {
             Oversized tailoring, brushed wool and leather softened by hand.
           </p>
           <div className="mt-8 flex justify-center gap-3 md:justify-start">
-            <ButtonLink href="/shop?sort=newest">Discover</ButtonLink>
+            <ButtonLink href="/new-arrivals">Discover</ButtonLink>
             <ButtonLink href="/shop/ready-to-wear" variant="secondary">
               Ready-to-wear
             </ButtonLink>
@@ -105,12 +106,12 @@ export default async function Home() {
               <p className="type-eyebrow">Just in</p>
               <h2 className="type-headline mt-3">New arrivals</h2>
             </div>
-            <Link href="/shop?sort=newest" className="link type-label shrink-0">
+            <Link href="/new-arrivals" className="link type-label shrink-0">
               View all
             </Link>
           </div>
           <ul className="rail -mx-gutter px-gutter scroll-px-gutter">
-            {newIn.slice(0, 8).map((product) => (
+            {newIn.map((product) => (
               <li key={product.id}>
                 <ProductCard product={product} />
               </li>

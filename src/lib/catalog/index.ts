@@ -96,6 +96,18 @@ export async function getProducts({
   return { items: rows.map(toProduct), total, hasMore: limit < total };
 }
 
+/** Products flagged as new (the same flag behind the "New" badge), newest first. */
+export async function getNewArrivals(limit?: number): Promise<Product[]> {
+  "use cache";
+  cacheTag("catalog", "stock");
+  cacheLife("minutes");
+  const query = selectProducts()
+    .where(eq(product.isNew, true))
+    .orderBy(...productOrder.newest);
+  const rows = await (limit ? query.limit(limit) : query);
+  return rows.map(toProduct);
+}
+
 export async function getProduct(slug: string): Promise<Product | undefined> {
   "use cache";
   cacheTag("catalog", "stock");

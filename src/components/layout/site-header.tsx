@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { BagLink } from "@/components/bag/bag-link";
 import { getCategories } from "@/lib/catalog";
 
 export async function SiteHeader() {
@@ -50,9 +51,11 @@ export async function SiteHeader() {
           <Link href="/shop" className="nav-link max-sm:hidden">
             Search
           </Link>
-          <Link href="/" className="nav-link">
-            Bag (0)
+          {/* Static on purpose: no session read in the shell. Guests are sent to sign-in. */}
+          <Link href="/account" className="nav-link">
+            Account
           </Link>
+          <BagLink />
         </div>
       </div>
     </header>

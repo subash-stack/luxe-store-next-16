@@ -24,7 +24,8 @@ export function ProductGallery({ product, tone }: { product: Product; tone: stri
           src={product.imageUrl}
           alt={`${product.name} in ${colorBySlug[product.color].name.toLowerCase()}`}
           fill
-          preload
+          loading="eager"
+          fetchPriority="high"
           sizes="(min-width: 64rem) 60vw, 100vw"
           className="object-cover"
         />

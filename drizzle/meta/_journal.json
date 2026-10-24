@@ -22,6 +22,34 @@
       "when": 1792867653053,
       "tag": "0002_product_image",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792875829789,
+      "tag": "0003_admin_role",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792876011564,
+      "tag": "0004_orders",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792878183769,
+      "tag": "0005_order_contact",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792880087008,
+      "tag": "0006_order_user_status",
+      "breakpoints": true
     }
   ]
 }

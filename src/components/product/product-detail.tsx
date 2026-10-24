@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 
+import { AddToBag } from "@/components/bag/add-to-bag";
 import { ProductCard } from "@/components/product/product-card";
 import { ProductGallery } from "@/components/product/product-gallery";
 import { StockStatus } from "@/components/product/stock-status";
@@ -95,13 +96,17 @@ export async function ProductDetail({ slug: slugPromise }: { slug: Promise<strin
           <div className="mt-6">
             <StockStatus stock={product.stock} />
             <div className="mt-4 grid gap-3">
-              <Button block disabled={soldOut}>
-                {soldOut ? "Sold out" : "Add to bag"}
-              </Button>
-              {soldOut && (
-                <Button variant="secondary" block>
-                  Notify me when available
-                </Button>
+              {soldOut ? (
+                <>
+                  <Button block disabled>
+                    Sold out
+                  </Button>
+                  <Button variant="secondary" block>
+                    Notify me when available
+                  </Button>
+                </>
+              ) : (
+                <AddToBag slug={product.slug} />
               )}
             </div>
             <p className="mt-4 text-caption text-ink-subtle">
