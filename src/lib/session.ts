@@ -33,11 +33,17 @@ export const getSession = cache(async () =>
   auth.api.getSession({ headers: await headers() }),
 );
 
-/** Only same-site paths, so `?next=` can't be used as an open redirect. */
+/**
+ * Only same-site paths, so `?next=` can't be used as an open redirect. Browsers
+ * read `/\evil.com` as `//evil.com`, so backslashes and control characters are
+ * rejected too, and the result must still resolve to this origin.
+ */
 export function safeNext(next: unknown, fallback = "/account") {
-  return typeof next === "string" && next.startsWith("/") && !next.startsWith("//")
-    ? next
-    : fallback;
+  if (typeof next !== "string" || !/^\/(?![/\\])/.test(next) || /[\\\u0000-\u001f]/.test(next)) {
+    return fallback;
+  }
+  const base = "http://same.origin";
+  return new URL(next, base).origin === base ? next : fallback;
 }
 
 function signInRedirect(next: string): never {

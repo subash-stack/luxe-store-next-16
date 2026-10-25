@@ -132,7 +132,8 @@ async function BagContents() {
           </ButtonLink>
         </div>
         <p className="mt-4 text-caption text-ink-subtle">
-          Complimentary shipping and returns within 30 days.
+          Complimentary shipping and returns within 30 days. You&apos;ll sign in or create an
+          account before payment, so your orders appear in your account.
         </p>
       </aside>
     </div>

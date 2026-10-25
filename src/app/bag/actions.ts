@@ -6,9 +6,11 @@ import { z } from "zod";
 
 import { MAX_QUANTITY, getBag, readBagEntries, writeBagEntries } from "@/lib/bag";
 import { getProduct } from "@/lib/catalog";
+import { TEST_CARDS } from "@/lib/card";
 import { DELIVERY_NOTE_MAX, emailError, phoneError } from "@/lib/checkout";
 import { OutOfStockError, createOrder } from "@/lib/orders";
-import { getSession } from "@/lib/session";
+import { clientIp, consumeRateLimit, retryMessage } from "@/lib/rate-limit";
+import { requireUser } from "@/lib/session";
 
 export type AddToBagState = { status: "idle" | "added" | "error"; message?: string };
 
@@ -102,13 +104,23 @@ const checkoutSchema = z.object({
     error: "Enter your card details.",
   }),
   cardLast4: z.string().regex(/^\d{4}$/, "Enter your card details."),
-});
+}).refine(
+  // Demo store: only the test cards are accepted. The browser checks the full
+  // number; this catches requests that skip the form.
+  (v) => TEST_CARDS.some((c) => c.brand === v.cardBrand && c.number.endsWith(v.cardLast4)),
+  { path: ["cardLast4"], error: "Real cards aren't accepted in this demo store. Use a test card." },
+);
 
 /** Checkout "Confirm payment": validates, creates the order, empties the bag. */
 export async function placeOrder(
   _prev: CheckoutState,
   formData: FormData,
 ): Promise<CheckoutState> {
+  // Orders always belong to an account, so they show in its order history. A
+  // signed-out request (an expired session, or one that skipped the page) is
+  // sent to sign-in and comes back to checkout; the bag cookie survives that.
+  const user = await requireUser("/checkout");
+
   const parsed = checkoutSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
     const fieldErrors: CheckoutState["fieldErrors"] = {};
@@ -125,15 +137,23 @@ export async function placeOrder(
     return { error: "Your bag is empty, or everything in it has sold out." };
   }
 
-  // Guests can still check out; signed-in shoppers see the order in their account.
-  const session = await getSession();
+  // Counted only once the form is valid, so typos don't use up attempts.
+  const limits = await Promise.all([
+    consumeRateLimit("checkoutIp", await clientIp()),
+    consumeRateLimit("checkoutUser", user.id),
+  ]);
+  for (const limit of limits) {
+    if (!limit.allowed) {
+      return { error: retryMessage(limit.retryAfterSeconds).replace("attempts", "orders") };
+    }
+  }
 
   let orderId: string;
   try {
     orderId = await createOrder(
       lines.map((l) => ({ slug: l.product.slug, quantity: l.quantity })),
       parsed.data,
-      session?.user.id,
+      user.id,
     );
   } catch (error) {
     if (error instanceof OutOfStockError) {
@@ -144,7 +164,11 @@ export async function placeOrder(
             : `${error.productName} has just sold out. Remove it from your bag and try again.`,
       };
     }
-    console.error(error);
+    // Name and code only: database errors can echo the shopper's details.
+    console.error("placeOrder failed", {
+      name: error instanceof Error ? error.name : typeof error,
+      code: (error as { code?: unknown })?.code,
+    });
     return { error: "We couldn't place your order. Nothing was charged; please try again." };
   }
 

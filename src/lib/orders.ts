@@ -46,8 +46,8 @@ export class OutOfStockError extends Error {
 export async function createOrder(
   lines: OrderLineInput[],
   details: OrderDetails,
-  /** The signed-in shopper, so the order shows in their account. */
-  userId?: string,
+  /** The signed-in shopper (checkout requires an account), so it shows in their history. */
+  userId: string,
 ): Promise<string> {
   // A Pool must be created and closed within the request on serverless platforms.
   const pool = new Pool({ connectionString: serverEnv.DATABASE_URL });
@@ -107,7 +107,7 @@ export async function createOrder(
 
       await t.insert(order).values({
         id,
-        userId: userId ?? null,
+        userId,
         ...details,
         addressLine2: details.addressLine2 || null,
         deliveryNote: details.deliveryNote || null,
@@ -147,6 +147,8 @@ export const orderStatusLabel: Record<OrderStatus, string> = {
 export type OrderSummary = {
   id: string;
   number: string;
+  /** Owner when placed signed in; null for guest orders. Server-side checks only. */
+  userId: string | null;
   status: OrderStatus;
   email: string;
   phone: string | null;
@@ -177,6 +179,7 @@ function toOrderSummary(row: OrderRow, items: OrderItemRow[]): OrderSummary {
   return {
     id: row.id,
     number: `LS-${row.number}`,
+    userId: row.userId,
     status: row.status,
     email: row.email,
     phone: row.phone,

@@ -23,6 +23,10 @@ export const auth = betterAuth({
     // Signed cookie copy of the session, so most reads skip the database.
     cookieCache: { enabled: true, maxAge: 5 * 60 },
   },
+  // Sign-in and sign-up go through our Server Actions (src/lib/auth-actions.ts),
+  // which apply rate limits. Their HTTP endpoints would bypass those, and
+  // nothing in the app calls them, so they're switched off.
+  disabledPaths: ["/sign-in/email", "/sign-up/email"],
   plugins: [
     // Adds user.role (not settable on sign-up). Admin checks live in src/lib/session.ts.
     admin({ defaultRole: "user", adminRoles: ["admin"] }),

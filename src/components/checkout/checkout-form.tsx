@@ -16,6 +16,7 @@ import {
   formatCardNumber,
   formatExpiry,
   onlyDigits,
+  TEST_CARDS,
   validateCard,
   type CardErrors,
   type CardInput,
@@ -49,7 +50,14 @@ const contactRules: Record<ContactField, (value: string) => string | undefined> 
   phone: phoneError,
 };
 
-export function CheckoutForm({ totalLabel }: { totalLabel: string }) {
+export function CheckoutForm({
+  totalLabel,
+  defaultEmail,
+}: {
+  totalLabel: string;
+  /** The account's email; editable if the shopper wants updates elsewhere. */
+  defaultEmail: string;
+}) {
   const [state, formAction, pending] = useActionState(placeOrder, initialState);
   const [card, setCard] = useState<CardInput>({ number: "", expiry: "", cvc: "", name: "" });
   const [cardErrors, setCardErrors] = useState<CardErrors>({});
@@ -119,6 +127,7 @@ export function CheckoutForm({ totalLabel }: { totalLabel: string }) {
               type="email"
               autoComplete="email"
               placeholder="you@example.com"
+              defaultValue={defaultEmail}
               required
               maxLength={EMAIL_MAX}
               onChange={(e) => checkContact(e.currentTarget, "email")}
@@ -228,9 +237,16 @@ export function CheckoutForm({ totalLabel }: { totalLabel: string }) {
 
       <FormSection title="Payment">
         <p className="border border-line bg-surface px-4 py-3 text-caption text-ink-muted">
-          Demo checkout: no payment is taken and card details never leave your browser.
-          Use test card <span className="tabular-nums text-ink">4242 4242 4242 4242</span>,
-          any future date and any CVC. Don&apos;t enter a real card.
+          Demo store: products and prices are placeholders, no payment is taken and
+          real cards are declined. Use a test card with any future date and any CVC:
+          <span className="mt-2 block">
+            {TEST_CARDS.map((c) => (
+              <span key={c.number} className="block">
+                {c.brand}{" "}
+                <span className="tabular-nums text-ink">{formatCardNumber(c.number)}</span>
+              </span>
+            ))}
+          </span>
         </p>
 
         {/* Stripe-style grouped card field: number on top, expiry and CVC below. */}
@@ -307,7 +323,13 @@ export function CheckoutForm({ totalLabel }: { totalLabel: string }) {
             </div>
           </div>
           <div id="card-errors" aria-live="polite">
-            {[cardErrors.number, cardErrors.expiry, cardErrors.cvc]
+            {[
+              cardErrors.number,
+              cardErrors.expiry,
+              cardErrors.cvc,
+              // Server-side test-card check (only reached if the browser check was skipped).
+              fieldErrors.cardLast4 ?? fieldErrors.cardBrand,
+            ]
               .filter(Boolean)
               .map((message) => (
                 <p key={message} className="field-error">

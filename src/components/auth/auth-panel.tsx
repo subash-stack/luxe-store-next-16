@@ -31,6 +31,12 @@ export async function AuthPanel({
 
   return (
     <>
+      {next.startsWith("/checkout") && (
+        <p className="mb-8 border border-line bg-surface px-4 py-3 text-caption text-ink-muted">
+          {mode === "sign-in" ? "Sign in" : "Create an account"} to check out. Your bag is
+          saved, and your orders will appear in your account.
+        </p>
+      )}
       <AuthForm mode={mode} next={next} />
       <p className="mt-8 text-ink-muted">
         {other.prompt}{" "}

@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { LineItem, Totals } from "@/components/bag/line-item";
 import { ButtonLink } from "@/components/ui/button";
 import { getOrder } from "@/lib/orders";
+import { requireUser } from "@/lib/session";
 
 export const metadata: Metadata = {
   title: "Order confirmed",
@@ -24,8 +25,16 @@ export default function OrderPage({ params }: PageProps<"/orders/[id]">) {
 
 /** Reads the route param and a fresh database row, so it renders at request time. */
 async function OrderDetails({ id: idPromise }: { id: Promise<string> }) {
-  const order = await getOrder(await idPromise);
+  const id = await idPromise;
+  const order = await getOrder(id);
   if (!order) notFound();
+  // Guest orders are reachable by their unguessable link alone. An order placed
+  // while signed in is only shown to that account: a shared or leaked link
+  // isn't enough. Anyone else gets the same 404 as a missing order.
+  if (order.userId) {
+    const user = await requireUser(`/orders/${id}`);
+    if (user.id !== order.userId) notFound();
+  }
 
   const itemCount = order.items.reduce((sum, i) => sum + i.quantity, 0);
 

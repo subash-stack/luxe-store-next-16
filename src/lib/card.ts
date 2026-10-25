@@ -1,5 +1,8 @@
-// Card helpers for the demo checkout. Used only in the browser: the full card
-// number, expiry and CVC never leave it. The server receives brand + last four.
+// Card helpers for the demo checkout. The full card number, expiry and CVC
+// never leave the browser; the server receives brand + last four only.
+//
+// The store is a demo (placeholder products and prices), so it never accepts a
+// real card: only the published test numbers below pass validation.
 
 export type CardBrand = "Visa" | "Mastercard" | "American Express" | "Card";
 
@@ -9,6 +12,13 @@ export function detectBrand(digits: string): CardBrand {
   if (/^3[47]/.test(digits)) return "American Express";
   return "Card";
 }
+
+/** The only card numbers checkout accepts. Shown to shoppers on the form. */
+export const TEST_CARDS = [
+  { brand: "Visa", number: "4242424242424242" },
+  { brand: "Mastercard", number: "5555555555554444" },
+  { brand: "American Express", number: "378282246310005" },
+] as const satisfies readonly { brand: CardBrand; number: string }[];
 
 export function onlyDigits(value: string) {
   return value.replace(/\D/g, "");
@@ -58,6 +68,8 @@ export function validateCard(card: CardInput, now = new Date()): CardErrors {
   if (digits.length === 0) errors.number = "Enter your card number.";
   else if (digits.length < length || !passesLuhn(digits)) {
     errors.number = "Your card number is incomplete or invalid.";
+  } else if (!TEST_CARDS.some((c) => c.number === digits)) {
+    errors.number = "This is a demo store: real cards aren't accepted. Use a test card shown above.";
   }
 
   const [mm, yy] = card.expiry.split("/").map((s) => Number(s.trim()));

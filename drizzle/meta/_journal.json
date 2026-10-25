@@ -50,6 +50,13 @@
       "when": 1792880087008,
       "tag": "0006_order_user_status",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792883061678,
+      "tag": "0007_app_rate_limit",
+      "breakpoints": true
     }
   ]
 }

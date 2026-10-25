@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { BagLink } from "@/components/bag/bag-link";
+import { MobileMenu } from "@/components/layout/mobile-menu";
 import { getCategories } from "@/lib/catalog";
 
 export async function SiteHeader() {
@@ -13,27 +14,7 @@ export async function SiteHeader() {
   return (
     <header className="site-header">
       <div className="page-container grid grid-cols-[1fr_auto_1fr] items-center">
-        {/* Mobile: native disclosure, no client JS. */}
-        <details className="group lg:hidden">
-          <summary className="type-label flex h-11 cursor-pointer list-none items-center [&::-webkit-details-marker]:hidden">
-            <span className="group-open:hidden">Menu</span>
-            <span className="hidden group-open:inline">Close</span>
-          </summary>
-          <nav
-            aria-label="Primary"
-            className="absolute inset-x-0 top-full border-b border-line bg-canvas"
-          >
-            <ul className="page-container divide-hairline">
-              {nav.map((item) => (
-                <li key={item.href}>
-                  <Link href={item.href} className="type-label block py-4">
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </details>
+        <MobileMenu nav={nav} />
 
         <nav aria-label="Primary" className="hidden gap-6 lg:flex">
           {nav.map((item) => (

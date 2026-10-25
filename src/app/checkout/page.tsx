@@ -7,6 +7,7 @@ import { LineItem, Totals } from "@/components/bag/line-item";
 import { CheckoutForm } from "@/components/checkout/checkout-form";
 import { getBag } from "@/lib/bag";
 import { formatPrice } from "@/lib/catalog";
+import { requireUser } from "@/lib/session";
 
 export const metadata: Metadata = {
   title: "Checkout",
@@ -26,8 +27,11 @@ export default function CheckoutPage() {
   );
 }
 
-/** Reads the bag cookie: request-time, so it streams in behind the boundary. */
+/** Reads the session and bag cookie: request-time, so it streams in behind the boundary. */
 async function CheckoutContents() {
+  // An account is required so the order lands in the shopper's order history.
+  // The proxy redirects signed-out visitors early; this is the real check.
+  const user = await requireUser("/checkout");
   const bag = await getBag();
   const lines = bag.lines.filter((l) => l.quantity > 0);
   if (lines.length === 0) redirect("/bag");
@@ -64,7 +68,7 @@ async function CheckoutContents() {
         </div>
       </aside>
 
-      <CheckoutForm totalLabel={formatPrice(bag.subtotal)} />
+      <CheckoutForm totalLabel={formatPrice(bag.subtotal)} defaultEmail={user.email} />
     </div>
   );
 }

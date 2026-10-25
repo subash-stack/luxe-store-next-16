@@ -13,5 +13,6 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/account/:path*", "/admin/:path*"],
+  // Checkout needs an account so every order shows in its owner's history.
+  matcher: ["/account/:path*", "/admin/:path*", "/checkout/:path*"],
 };

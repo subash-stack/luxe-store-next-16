@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { auth } from "@/lib/auth";
+import { clientIp, consumeRateLimit, retryMessage } from "@/lib/rate-limit";
 import { safeNext } from "@/lib/session";
 
 export type AuthFormState = { error?: string; email?: string; name?: string };
@@ -34,6 +35,9 @@ export async function signUp(
   if (!parsed.success) {
     return { ...echo, error: parsed.error.issues[0]?.message };
   }
+
+  const limit = await consumeRateLimit("signUpIp", await clientIp());
+  if (!limit.allowed) return { ...echo, error: retryMessage(limit.retryAfterSeconds) };
 
   try {
     // autoSignIn creates the session; nextCookies writes the cookie.
@@ -64,6 +68,15 @@ export async function signIn(
   const parsed = signInSchema.safeParse(raw);
   if (!parsed.success) {
     return { ...echo, error: "Enter your email and password." };
+  }
+
+  // Both limits count every attempt, so a correct password doesn't reset them.
+  const [byIp, byEmail] = await Promise.all([
+    consumeRateLimit("signInIp", await clientIp()),
+    consumeRateLimit("signInEmail", parsed.data.email),
+  ]);
+  for (const limit of [byIp, byEmail]) {
+    if (!limit.allowed) return { ...echo, error: retryMessage(limit.retryAfterSeconds) };
   }
 
   try {
